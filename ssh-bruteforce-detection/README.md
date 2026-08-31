@@ -1,4 +1,4 @@
-Original Alert / Question
+Alert / Question
 
 Does /var/log/auth.log show a pattern of repeated failed SSH logins followed by a success, consistent with brute-force behaviour — and if so, is it a real attack or a legitimate user struggling to authenticate?
 
