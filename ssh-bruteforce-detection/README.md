@@ -20,13 +20,13 @@
 ````
 ## 2. Original Alert / Question
 
-Does `/var/log/auth.log` show a pattern of repeated failed SSH logins followed by a success, consistent with brute-force behaviour — and if so, is it a real attack or a legitimate user struggling to authenticate?
+Does `/var/log/auth.log` show a pattern of repeated failed SSH logins followed by a success, consistent with brute-force behaviour and if so, is it a real attack or a legitimate user struggling to authenticate?
 
 There is no native scheduled alerting on Splunk Free, so this detection runs as a saved Report against a fail-streak-before-success threshold (`fail_streak >= 5` within a 15-minute window).
 
 ## 3. Raw Evidence & Timeline
 
-Initial investigation (Section 3, original) used a hardcoded 12:33:00–12:36:31 window based on the fail_streak detection alone. Widening the window and extracting the `user` field revealed a materially different — and more accurate — picture. The regex initially failed to extract usernames for most rows because sshd logs invalid-account attempts as `Failed password for invalid user <name> from...`, not the plain `for <name> from` format the first regex expected. Fixed with `"for (?:invalid user )?(?<ssh_user>\w+) from"`.
+Initial investigation used a hardcoded 12:33:00–12:36:31 window based on the fail_streak detection alone. Widening the window and extracting the `user` field revealed a materially different and more accurate picture. The regex initially failed to extract usernames for most rows because sshd logs invalid-account attempts as `Failed password for invalid user <name> from...`, not the plain `for <name> from` format the first regex expected. Fixed with `"for (?:invalid user )?(?<ssh_user>\w+) from"`.
 
 ![Corrected timeline with user field](assets/05-corrected-timeline-user-breakdown.png)
 
@@ -35,12 +35,12 @@ Initial investigation (Section 3, original) used a hardcoded 12:33:00–12:36:31
 | Time | Event | Target account |
 |---|---|---|
 | 12:19:47 | success | `loxsec` |
-| 12:23:47 – 12:35:41 | 24× fail | `mangoman` (invalid — account does not exist on system) |
+| 12:23:47 – 12:35:41 | 24× fail | `mangoman` (invalid account does not exist on system) |
 | 12:36:20 | fail | `loxsec` |
 | 12:36:22 | fail | `loxsec` |
 | **12:36:31** | **success** | **`loxsec`** |
 
-The full window (bounded by the two `loxsec` successes) spans **~17 minutes**, not the ~3-minute burst originally assumed. `fail_streak=26` from the detection query counts every fail between the 12:19:47 success and the 12:36:31 success — 24 of those were against a nonexistent account, only 2 were against the real one.
+The full window (bounded by the two `loxsec` successes) spans **~17 minutes**, not the ~3-minute burst originally assumed. `fail_streak=26` from the detection query counts every fail between the 12:19:47 success and the 12:36:31 success 24 of those were against a nonexistent account, only 2 were against the real one.
 
 
 ## 4. Competing Hypotheses & Investigation
