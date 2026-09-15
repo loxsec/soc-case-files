@@ -2,7 +2,7 @@
 
 **Dataset:** Splunk BOTS v1
 **Target:** `imreallynotbatman.com` (192.168.250.70)
-**Analyst:** Goodluck (loxsec)
+**Analyst:** Chibuzor (loxsec)
 
 ---
 
@@ -41,7 +41,6 @@ An external actor scanned Wayne Enterprises' public Joomla web server, and while
 | Path traversal on `win.ini` was the initial access vector | Checked `dest_content` and `http_content_type` on every `status=200` hit for `win.ini` | **Disproven.** Every apparent success was a false positive: an unrelated OpenSearch XML response, a Joomla search page that swallowed the payload as inert text, and an empty-body response from a second injection point (`tmpl` parameter). No real file content was ever returned. |
 | Blind SQL injection on the Joomla search component succeeded | Converted `duration` (microseconds) to seconds and compared against each request's injected `sleep()`/`pg_sleep()` value | **Disproven.** Response times clustered around 1–12 seconds with no proportional relationship to the injected sleep value (e.g., `sleep(0)` took longer than `sleep(4)`). Several attempts returned HTTP 500, consistent with malformed/failed query execution rather than successful injection. |
 | HTTP 200 + large response size indicates a successful exploit | Reasoned through the mechanics of each attack class (SQLi is blind by design; path traversal and file reads are not) | **Refined.** Response-size anomalies are a valid indicator only for attacks that return content directly (e.g., path traversal). They are structurally meaningless for blind SQLi, which produces no visible response difference. |
-| Initial access came from an exploited application vulnerability | Traced all `status=200`/`303` outcomes across every attack type attempted | **Disproven.** No exploited vulnerability was found. Initial access came from a separate actor's successful credential brute-force, followed by valid-credential login — not exploitation of the public-facing application itself. |
 | The `admin:batman` login by 40.80.148.42 was itself a brute-force success | Checked whether `status=303` differed between failed and successful login attempts | **Corrected mid-investigation.** All login attempts — failed and successful — returned `303`, so status code alone does not indicate success on this login form. Success was instead confirmed by the *subsequent* authenticated actions (`com_installer`, `com_extplorer`) that followed the `admin:batman` attempt, which never occurred after any of the other credentials were tried. |
 
 ### 3.2 SPL Queries Used
