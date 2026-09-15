@@ -52,6 +52,9 @@ index="botsv1" "imreallynotbatman.com"
 | eval total_bytes = bytes_in + bytes_out
 | table src_ip, dest_ip, total_bytes, count
 ```
+<img width="1865" height="1080" alt="2026-09-15_06-28-43" src="https://github.com/user-attachments/assets/afdddc5c-2a9f-4c63-bbd4-6c841c887c14" />
+
+
 
 **Determine scan scope:**
 ```spl
@@ -59,6 +62,9 @@ index="botsv1" src_ip="40.80.148.42" status="200"
 | stats count, sum(bytes) as total_data_transferred, values(http_method) as methods by uri_path
 | sort - count
 ```
+<img width="1874" height="1080" alt="2026-09-15_06-32-24" src="https://github.com/user-attachments/assets/2cbac606-3834-4366-a7fe-c87b4babd036" />
+
+
 
 **Find the vulnerability point (injection payload search):**
 ```spl
@@ -67,6 +73,8 @@ index="botsv1" src_ip="40.80.148.42" sourcetype="stream:http"
 | table _time, src_ip, dest_ip, uri_path, uri_query, form_data, status
 | sort _time
 ```
+<img width="1871" height="1080" alt="2026-09-15_06-37-46" src="https://github.com/user-attachments/assets/ad2f7f4a-5953-456e-aca4-ad79829e6f33" />
+
 
 **Validate path traversal (content-body confirmation, not just status code):**
 ```spl
@@ -75,6 +83,11 @@ index=botsv1 sourcetype=stream:http src_ip="40.80.148.42" uri_path="*win.ini*" s
 | table _time, uri_query, http_content_type, bytes_out, dest_content
 | sort _time
 ```
+<img width="1867" height="1080" alt="2026-09-15_06-39-36" src="https://github.com/user-attachments/assets/ff87aabc-2ebc-423b-a62e-ab02ae2cb54e" />
+
+<img width="1865" height="1080" alt="2026-09-15_06-40-47" src="https://github.com/user-attachments/assets/9466b8cf-c38c-404e-8ad2-80d74021fdc3" />
+
+
 
 **Validate blind SQLi (timing correlation check):**
 ```spl
@@ -83,20 +96,32 @@ index=botsv1 sourcetype=stream:http src_ip="40.80.148.42" uri_path="*component/s
 | table _time, uri_query, status, duration
 | sort _time
 ```
+<img width="1870" height="1080" alt="2026-09-15_06-42-03" src="https://github.com/user-attachments/assets/1deef849-6ad7-4cc7-8f55-79136c5490d0" />
+
+<img width="1869" height="1080" alt="2026-09-15_06-42-44" src="https://github.com/user-attachments/assets/9a227b98-1286-4639-9697-7ed55e176148" />
+
 
 **Brute-force identification and credential correlation:**
 ```spl
 index=botsv1 sourcetype=stream:http dest_ip="192.168.250.70" http_method=POST uri_path="*administrator*"
 | rex field=form_data "passwd=(?<pass>\w+)"
-| stats count by src_ip, pass
+| stats count by pass
 ```
+<img width="1861" height="1080" alt="2026-09-15_06-52-01" src="https://github.com/user-attachments/assets/15f2f985-9f03-4ee3-b7ad-661c735b5eab" />
+
+<img width="1869" height="1080" alt="2026-09-15_06-56-07" src="https://github.com/user-attachments/assets/b7267412-9e8a-4bde-9174-8241d1b55906" />
+
+
 
 **Confirm successful login (via subsequent authenticated activity, not status code):**
 ```spl
-index=botsv1 sourcetype=stream:http src_ip="40.80.148.42" http_method=POST uri_path="administrator/index.php"
+index=botsv1 sourcetype=stream:http src_ip="40.80.148.42" http_method=POST uri_path="*administrator/index.php*"
 | table _time, uri_path, status, uri_query, form_data
 | sort _time
 ```
+<img width="1870" height="1080" alt="2026-09-15_06-57-25" src="https://github.com/user-attachments/assets/e130d3d4-57b2-4309-8cba-a4a4bdda0879" />
+
+
 
 **Track the web shell upload (Suricata file tracking):**
 ```spl
@@ -105,8 +130,10 @@ index=botsv1 http_method=POST dest_ip="192.168.250.70" filename="3791.exe"
 
 **Correlate to endpoint execution (Sysmon pivot):**
 ```spl
-index=botsv1 sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventID=1 CommandLine="*3791.exe*"
+index=botsv1 sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventID=1 CommandLine="*.exe*"
 ```
+<img width="1873" height="1079" alt="2026-09-15_07-00-45" src="https://github.com/user-attachments/assets/b78d165d-27f6-47a0-b398-78054193d1ee" />
+
 
 **Detect C2 beaconing (outbound connections from the victim host):**
 ```spl
@@ -114,6 +141,10 @@ index=botsv1 sourcetype=stream:http src_ip="192.168.250.70"
 | stats count by dest_ip, dest_port
 | sort -count
 ```
+<img width="1869" height="1080" alt="2026-09-15_07-02-00" src="https://github.com/user-attachments/assets/b8291956-ec45-4c05-b379-705b3a8c9af2" />
+<img width="1865" height="1080" alt="2026-09-15_07-02-31" src="https://github.com/user-attachments/assets/8135762d-29ba-4c40-a124-147015561900" />
+
+
 
 ---
 
@@ -152,3 +183,4 @@ The compromised process ran as `NT AUTHORITY\IUSR` — the IIS anonymous/applica
 
 **4. Enforce credential hygiene on the Joomla admin panel.**
 The root cause enabling this entire chain was a weak, dictionary-guessable administrator password (`batman`). Enforce strong password policy, rate-limit or lock out repeated failed logins against `com_login`, and consider MFA on the admin panel given its direct path to full remote code execution.
+
