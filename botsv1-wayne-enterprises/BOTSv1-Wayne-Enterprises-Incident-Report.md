@@ -97,6 +97,13 @@ index=botsv1 sourcetype=stream:http src_ip="40.80.148.42" uri_path="*component/s
 ```
 <img width="1870" height="1080" alt="2026-09-15_06-42-03" src="https://github.com/user-attachments/assets/1deef849-6ad7-4cc7-8f55-79136c5490d0" />
 
+```spl
+index=botsv1 sourcetype=stream:http src_ip="40.80.148.42" uri_path="*component/search*"
+| regex uri_query="sleep\(\d+\)"
+| table _time, uri_query, status, duration
+| where duration > 2000000
+| sort _time
+```
 <img width="1869" height="1080" alt="2026-09-15_06-42-44" src="https://github.com/user-attachments/assets/9a227b98-1286-4639-9697-7ed55e176148" />
 
 
@@ -108,6 +115,13 @@ index=botsv1 sourcetype=stream:http dest_ip="192.168.250.70" http_method=POST ur
 ```
 <img width="1861" height="1080" alt="2026-09-15_06-52-01" src="https://github.com/user-attachments/assets/15f2f985-9f03-4ee3-b7ad-661c735b5eab" />
 
+```spl
+index=botsv1 sourcetype=stream:http dest_ip="192.168.250.70" http_method=POST uri_path="*administrator*"
+| rex field=form_data "passwd=(?<pass>\w+)"
+| where pass="batman"
+| sort _time
+| table _time src_ip pass
+```
 <img width="1869" height="1080" alt="2026-09-15_06-56-07" src="https://github.com/user-attachments/assets/b7267412-9e8a-4bde-9174-8241d1b55906" />
 
 
