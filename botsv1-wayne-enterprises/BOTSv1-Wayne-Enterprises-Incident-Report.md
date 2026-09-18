@@ -143,7 +143,7 @@ index=botsv1 http_method=POST dest_ip="192.168.250.70" filename="3791.exe"
 
 **Correlate to endpoint execution (Sysmon pivot):**
 ```spl
-index=botsv1 sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventID=1 CommandLine="*.exe*"
+index=botsv1 sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventID=1 CommandLine="*3791.exe*"
 ```
 <img width="1873" height="1079" alt="2026-09-15_07-00-45" src="https://github.com/user-attachments/assets/b78d165d-27f6-47a0-b398-78054193d1ee" />
 
