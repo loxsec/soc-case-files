@@ -1,4 +1,5 @@
-BOTS v1 Investigation — Compromise of a Public-Facing Joomla Server
+BOTS v1 Investigation
+Compromise of a Public-Facing Joomla Server
 
 A SOC-analyst-style incident investigation built on the Splunk Boss of the SOC (BOTS) v1 dataset. Instead of treating it as a CTF answer key, this project is written up as a full incident response engagement: hypotheses tested against raw log evidence, dead ends documented, and findings mapped to MITRE ATT&CK.
 
