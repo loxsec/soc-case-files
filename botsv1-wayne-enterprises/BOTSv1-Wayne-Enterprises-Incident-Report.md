@@ -64,17 +64,6 @@ index="botsv1" src_ip="40.80.148.42" status="200"
 <img width="1874" height="1080" alt="2026-09-15_06-32-24" src="https://github.com/user-attachments/assets/2cbac606-3834-4366-a7fe-c87b4babd036" />
 
 
-
-**Find the vulnerability point (injection payload search):**
-```spl
-index="botsv1" src_ip="40.80.148.42" sourcetype="stream:http"
-| regex uri_query="(?i)(union\s+select|select.*from|or\s+1=1|<script|\.\./\.\./|etc/passwd|cmd\.exe|base64_decode)"
-| table _time, src_ip, dest_ip, uri_path, uri_query, form_data, status
-| sort _time
-```
-<img width="1871" height="1080" alt="2026-09-15_06-37-46" src="https://github.com/user-attachments/assets/ad2f7f4a-5953-456e-aca4-ad79829e6f33" />
-
-
 **Validate path traversal (content-body confirmation, not just status code):**
 ```spl
 index=botsv1 sourcetype=stream:http src_ip="40.80.148.42" uri_path="*win.ini*" status=200
@@ -85,6 +74,18 @@ index=botsv1 sourcetype=stream:http src_ip="40.80.148.42" uri_path="*win.ini*" s
 <img width="1867" height="1080" alt="2026-09-15_06-39-36" src="https://github.com/user-attachments/assets/ff87aabc-2ebc-423b-a62e-ab02ae2cb54e" />
 
 <img width="1865" height="1080" alt="2026-09-15_06-40-47" src="https://github.com/user-attachments/assets/9466b8cf-c38c-404e-8ad2-80d74021fdc3" />
+
+
+
+
+**Find the vulnerability point (injection payload search):**
+```spl
+index="botsv1" src_ip="40.80.148.42" sourcetype="stream:http"
+| regex uri_query="(?i)(union\s+select|select.*from|or\s+1=1|<script|\.\./\.\./|etc/passwd|cmd\.exe|base64_decode)"
+| table _time, src_ip, dest_ip, uri_path, uri_query, form_data, status
+| sort _time
+```
+<img width="1871" height="1080" alt="2026-09-15_06-37-46" src="https://github.com/user-attachments/assets/ad2f7f4a-5953-456e-aca4-ad79829e6f33" />
 
 
 
