@@ -8,7 +8,7 @@
 
 ## 1. Executive Summary
 
-An external actor scanned Wayne Enterprises' public Joomla web server, and while their SQL injection and path traversal attempts against the application failed, a separate actor successfully brute-forced the Joomla admin panel's weak credentials (`admin:batman`). The stolen credentials were then used by a second IP to log in, install a malicious file-manager extension as a delivery mechanism, upload a web shell, and execute commands on the host — resulting in confirmed remote code execution and a suspected connection to external command-and-control infrastructure. As of this report, the server is considered compromised and remediation (credential reset, web root integrity restoration, and network egress review) is required immediately.
+An external actor scanned Wayne Enterprises' public Joomla web server, and while their SQL injection and path traversal attempts against the application failed, a separate actor from the same APT group successfully brute-forced the Joomla admin panel's weak credentials (`admin:batman`). The stolen credentials were then used by a second IP to log in, install a malicious file-manager extension as a delivery mechanism, upload a web shell, and execute commands on the host — resulting in confirmed remote code execution and a suspected connection to external command-and-control infrastructure. As of this report, the server is considered compromised and remediation (credential reset, web root integrity restoration, and network egress review) is required immediately.
 
 ---
 
