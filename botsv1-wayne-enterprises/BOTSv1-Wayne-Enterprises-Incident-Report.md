@@ -138,7 +138,7 @@ index=botsv1 sourcetype=stream:http src_ip="40.80.148.42" http_method=POST uri_p
 
 **Track the web shell upload (Suricata file tracking):**
 ```spl
-index=botsv1 http_method=POST dest_ip="192.168.250.70" filename="3791.exe"
+index=botsv1 http_method=POST dest_ip="192.168.250.70" filename="*.exe"
 ```
 
 **Correlate to endpoint execution (Sysmon pivot):**
