@@ -127,7 +127,7 @@ index=main sourcetype="sshd_log"
 - **Confirmed misreading, caught and fixed (v2→v3):** the original narrative assumed all 26 fails targeted the same account. They didn't — 24 targeted a nonexistent username, only 2 targeted the real account. The regex bug that hid this (silently failing on "invalid user" lines) is itself a reminder that a blank/null field should be investigated, not assumed benign.
 - **Single-source limitation:** all traffic originates from the lab's own Termux host — no genuine external-vs-internal contrast available in this dataset.
 - **Open, not yet resolved:** inter-fail timing distribution (v4) hasn't been run.
-- **No post-login session data pulled yet** (Hypothesis 5) — the largest remaining gap, intentionally carried forward rather than closed (see Section 4 status note).
+-Post-login session visibility gap (Hypothesis 5): this lab's logging setup captured authentication-layer events only (auth.log/sshd.log), not session-level telemetry (command execution, sudo usage, new keys, outbound connections). This is a scope limitation of the setup at the time, not an unexecuted step — see Section 4. Closed going forward by live host-level monitoring in the Wazuh project.
 
 ---
 
